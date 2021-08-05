@@ -1,3 +1,4 @@
+//user schema
 let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 let bcrypt = require("bcrypt");
@@ -72,4 +73,5 @@ userSchema.methods.isFavorite = function(id){
         return false;
     }
 }
+
 module.exports = mongoose.model("User", userSchema);
