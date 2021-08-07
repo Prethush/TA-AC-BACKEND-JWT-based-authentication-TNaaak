@@ -13,8 +13,6 @@ let userSchema = new Schema({
     bio: String,
     image: String,
     following: Boolean,
-    articles: [{type: Schema.Types.ObjectId, ref: "Article"}],
-    comments: [{type: Schema.Types.ObjectId, ref: "Comment"}],
     followingList: [{type: Schema.Types.ObjectId, ref: "User"}],
     followersList: [{type: Schema.Types.ObjectId, ref: "User"}],
     
@@ -51,7 +49,7 @@ userSchema.methods.userJSON = function(token) {
         username: this.username,
         email: this.email,
         bio: this.bio,
-        image: null,
+        image: this.image,
         token: token
     }
 }
@@ -59,19 +57,11 @@ userSchema.methods.userJSON = function(token) {
 userSchema.methods.displayUser = function(id = null) {
     return {
         username: this.username,
-        email: this.email,
         bio: this.bio,
         image: this.image, 
         following: id ? this.followersList.includes(id) : false
     }
 }
 
-userSchema.methods.isFavorite = function(id){
-    if(this.favoriteList.indexOf(id) !== -1){
-        return true;
-    }else {
-        return false;
-    }
-}
 
 module.exports = mongoose.model("User", userSchema);

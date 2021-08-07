@@ -19,19 +19,6 @@ let articleSchema = new Schema({
 }, {timestamps: true});
 
 
-articleSchema.methods.displayAuthor = async function(id) {
-    try{
-        let writer = await User.findById(id); 
-        return writer;
-    }catch(error) {
-        return error;
-    }
-    
-}
-
-articleSchema.methods.isFavorite = function(id) {
-   
-}
 
 articleSchema.methods.displayArticle = function(id = null) {
     console.log(this.favoriteList.includes(id));

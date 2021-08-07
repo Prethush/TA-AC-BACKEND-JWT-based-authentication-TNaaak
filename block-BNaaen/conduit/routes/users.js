@@ -2,17 +2,16 @@ var express = require('express');
 var router = express.Router();
 var User = require('../models/users');
 var auth = require('../middleware/auth');
+var bcrypt = require('bcrypt');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
 
 //register user
 router.post('/register', async (req, res, next) => {
+  req.body.user.following = false;
   try{
     var user = await User.create(req.body.user);
-    res.status(200).json({user: {name: user.username, email: user.email, bio: user.bio}});
+    var token = await user.signToken();
+    return res.status(201).json({user: user.userJSON(token)});
   }catch(error){
     next(error);
   }
@@ -35,19 +34,21 @@ router.post('/login', async (req, res, next) => {
     }
   
     var token = await user.signToken();
-    return res.status(200).json({user: user.userJSON(token)});
+    return res.status(201).json({user: user.userJSON(token)});
   }catch(error) {
     next(error);
   }
 });
 
 router.use(auth.verifyToken);
+
 //get current user
 router.get('/', async (req, res, next) => {
     let id = req.user.userId;
+    console.log(id);
     try{
         let user = await User.findById(id);
-        res.status(200).json({user: user.displayUser()})
+        res.status(200).json({user: user.displayUser(id)})
     }catch(error) {
         next(error);
     }
@@ -62,7 +63,7 @@ router.put('/', async (req, res, next) => {
             req.body.user.passwd = await bcrypt.hash(req.body.user.passwd, 10);  
         }
         user = await User.findByIdAndUpdate(id, req.body.user);
-        return res.status(200).json({user: user.displayUser()})
+        return res.status(201).json({user: user.displayUser(id)})
     }catch(error) {
         next(error);
     }
